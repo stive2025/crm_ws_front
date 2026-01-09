@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import callImage from "../../images/called.png";
 
@@ -11,12 +12,29 @@ import { Loader } from "../../components/common/Loader";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const {
     login,
     loading,
     error: errorFromStore,
+    isAuthenticated,
   } = useAuthStore();
+
+  // Efecto para redirigir cuando esté autenticado
+  useEffect(() => {
+    console.log("🔍 Login - Efecto ejecutándose, isAuthenticated:", isAuthenticated);
+    
+    // Verificar tanto el store como localStorage para mayor seguridad
+    const token = localStorage.getItem("auth_token");
+    if (token || isAuthenticated) {
+      console.log("✅ Login - Redirigiendo a /chats");
+      // Pequeño delay para asegurar que todo está listo
+      setTimeout(() => {
+        navigate("/chats", { replace: true });
+      }, 100);
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +43,15 @@ const Login = () => {
       return;
     }
 
-    await login(email, password);
+    console.log("🔄 Login - Iniciando proceso de login...");
+    const success = await login(email, password);
+    
+    if (success) {
+      console.log("✅ Login - Proceso completado, esperando redirección...");
+    } else {
+      console.log("❌ Login - Falló el proceso");
+    }
   };
-
 
   return (
     <div className="login-container">
@@ -67,7 +91,6 @@ const Login = () => {
               {errorFromStore && (
                 <p className="login-error mt-3">{errorFromStore}</p>
               )}
-
             </form>
           </div>
 

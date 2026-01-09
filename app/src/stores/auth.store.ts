@@ -1,3 +1,4 @@
+// src/stores/auth.store.ts
 import { create } from "zustand";
 import api from "../services/api";
 
@@ -38,11 +39,9 @@ interface AuthState {
   user: User | null;
   token: string | null;
   accessToken: AccessToken | null;
-
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -52,7 +51,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   accessToken: null,
-
   isAuthenticated: false,
   loading: false,
   error: null,
@@ -75,10 +73,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error("No se recibió plainTextToken");
       }
 
+      // 1. Guardar token en localStorage
       localStorage.setItem("auth_token", plainToken);
+      console.log("✅ Token guardado:", plainToken.substring(0, 20) + "...");
 
+      // 2. Configurar token en headers de axios
       api.defaults.headers.common.Authorization = `Bearer ${plainToken}`;
 
+      // 3. Actualizar el store COMPLETAMENTE
       set({
         status,
         user,
@@ -88,18 +90,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       });
 
+      console.log("✅ Store actualizado - isAuthenticated = true");
       return true;
+
     } catch (err: any) {
       console.error("🔴 ERROR LOGIN:", err);
-
       set({
-        error:
-          err.response?.data?.message ||
-          err.message ||
-          "Error de autenticación",
+        error: err.response?.data?.message || err.message || "Error de autenticación",
         loading: false,
       });
-
       return false;
     }
   },
@@ -117,5 +116,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       loading: false,
       error: null,
     });
+
+    // Redirigir a login
+    window.location.href = '/login';
   },
 }));
