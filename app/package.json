@@ -12,14 +12,16 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
     "react": "^19.0.0-rc-f994737d14-20240522",
     "react-dom": "^19.0.0-rc-f994737d14-20240522",
     "react-router-dom": "^6.27.0",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@types/date-fns": "^2.5.3",
     "@types/node": "^22.7.5",
     "@types/react": "^19.0.0-rc.1",
     "@types/react-dom": "^19.0.0-rc.1",
