@@ -1,5 +1,3 @@
-// src/components/common/Button.tsx
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -18,7 +16,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={`login-button ${className}`}  // ← usa TU clase + extras
+      className={`login-button ${className}`}  
       disabled={loading || disabled}
       {...props}
     >
