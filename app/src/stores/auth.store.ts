@@ -1,6 +1,6 @@
-// src/stores/auth.store.ts
 import { create } from "zustand";
 import api from "../services/api";
+import { useUserStore } from "./user.store";
 
 interface AccessToken {
   name: string;
@@ -18,7 +18,7 @@ interface TokenData {
   plainTextToken: string;
 }
 
-interface User {
+export interface AuthUser {
   id: number;
   name: string;
   email: string;
@@ -31,12 +31,12 @@ interface User {
 interface AuthResponse {
   status: number;
   token: TokenData;
-  user: User;
+  user: AuthUser;
 }
 
 interface AuthState {
   status: number | null;
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   accessToken: AccessToken | null;
   isAuthenticated: boolean;
@@ -67,36 +67,40 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { status, token, user } = response.data;
 
       const plainToken = token.plainTextToken;
-      const accessToken = token.accessToken;
-
       if (!plainToken) {
-        throw new Error("No se recibió plainTextToken");
+        throw new Error("No se recibió el token");
       }
 
-      // 1. Guardar token en localStorage
+      // 🔐 Guardar token
       localStorage.setItem("auth_token", plainToken);
-      console.log("✅ Token guardado:", plainToken.substring(0, 20) + "...");
 
-      // 2. Configurar token en headers de axios
+      // 🔗 Configurar axios
       api.defaults.headers.common.Authorization = `Bearer ${plainToken}`;
 
-      // 3. Actualizar el store COMPLETAMENTE
+      // 🧠 Guardar en auth.store
       set({
         status,
         user,
         token: plainToken,
-        accessToken,
+        accessToken: token.accessToken,
         isAuthenticated: true,
         loading: false,
       });
 
-      console.log("✅ Store actualizado - isAuthenticated = true");
-      return true;
+      // 🔄 Sincronizar con user.store
+      useUserStore.getState().setUser({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
 
+      return true;
     } catch (err: any) {
-      console.error("🔴 ERROR LOGIN:", err);
       set({
-        error: err.response?.data?.message || err.message || "Error de autenticación",
+        error:
+          err.response?.data?.message ||
+          err.message ||
+          "Error de autenticación",
         loading: false,
       });
       return false;
@@ -117,7 +121,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       error: null,
     });
 
-    // Redirigir a login
-    window.location.href = '/login';
+    useUserStore.getState().reset();
+    window.location.href = "/login";
   },
 }));

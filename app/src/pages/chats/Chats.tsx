@@ -1,5 +1,5 @@
-// src/pages/chats/Chats.tsx
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ChatList } from '../../components/Chats/ChatList';
 import { ChatHeader } from '../../components/Chats/ChatHeader';
 import { useChatsStore } from '../../stores/chats.store';
@@ -38,18 +38,23 @@ export const Chats: React.FC = () => {
     };
   }, []);
 
-  // Función para cerrar sesión
   const handleLogout = () => {
-    logout(); // Usa el logout de tu store
+    logout();
   };
 
   return (
     <div className="chats-container">
-      {/* ... resto del código permanece igual ... */}
       <div className="chats-sidebar">
         <div className="sidebar-header">
           <h1 className="text-xl font-bold text-gray-900">Chats</h1>
           <div className="flex items-center gap-2">
+            <Link 
+              to="/profile" 
+              className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md transition-colors"
+              title="Ver perfil"
+            >
+              Perfil
+            </Link>
             <button 
               onClick={handleLogout}
               className="logout-button px-3 py-1.5 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-md transition-colors"

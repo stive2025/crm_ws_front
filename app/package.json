@@ -11,11 +11,17 @@
     "check-types": "npm ls react react-dom @types/react @types/react-dom"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0-rc-f994737d14-20240522",
     "react-dom": "^19.0.0-rc-f994737d14-20240522",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^6.27.0",
     "zustand": "^5.0.9"
   },

@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import callImage from "../../images/called.png";
-
 import { useAuthStore } from "../../stores/auth.store";
-
 import { Input } from "../../components/common/Input";
 import { Button } from "../../components/common/Button";
 import { Loader } from "../../components/common/Loader";
@@ -28,10 +26,10 @@ const Login = () => {
     // Verificar tanto el store como localStorage para mayor seguridad
     const token = localStorage.getItem("auth_token");
     if (token || isAuthenticated) {
-      console.log("✅ Login - Redirigiendo a /chats");
+      console.log("✅ Login - Redirigiendo a /profile");
       // Pequeño delay para asegurar que todo está listo
       setTimeout(() => {
-        navigate("/chats", { replace: true });
+        navigate("/profile", { replace: true });
       }, 100);
     }
   }, [isAuthenticated, navigate]);
