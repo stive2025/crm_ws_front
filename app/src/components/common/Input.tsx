@@ -15,7 +15,7 @@ export const Input = ({
     <div className="flex flex-col gap-1">
       {label && <label className="text-sm font-medium">{label}</label>}
       <input
-        className={`login-input ${className}`}  // ← usa TU clase de Login.css + cualquier extra
+        className={`login-input ${className}`} 
         {...props}
       />
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}

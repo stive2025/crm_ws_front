@@ -3,7 +3,6 @@ import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-// Definir tipo aquí mismo (copiado del store)
 interface Chat {
   id: string;
   name: string;

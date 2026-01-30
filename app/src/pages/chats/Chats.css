@@ -75,7 +75,6 @@
   overflow-y: auto;
 }
 
-/* Scrollbar styling */
 .chat-list-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -93,7 +92,6 @@
   background: #a8a8a8;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .chats-sidebar {
     width: 350px;

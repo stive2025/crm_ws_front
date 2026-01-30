@@ -121,7 +121,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activePage = 'pro
           </List>
         </Box>
 
-        {/* PERFIL (fuera del box de logout) */}
         <Box sx={{ px: 2, pb: 1 }}>
           <ListItemButton
             onClick={() => navigate('/profile')}
@@ -150,7 +149,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activePage = 'pro
           </ListItemButton>
         </Box>
 
-        {/* FOOTER: SOLO LOGOUT */}
         <Box
           sx={{
             p: 2,
@@ -180,7 +178,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activePage = 'pro
         </Box>
       </Paper>
 
-      {/* MODAL CONFIRMACIÓN LOGOUT */}
       <Dialog 
         open={openLogoutDialog} 
         onClose={handleLogoutCancel}
@@ -199,6 +196,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activePage = 'pro
           <MuiButton 
             onClick={handleLogoutCancel}
             variant="outlined"
+            color="error"              
             sx={{ minWidth: 100 }}
           >
             Cancelar
@@ -206,7 +204,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ activePage = 'pro
           <MuiButton 
             onClick={handleLogoutConfirm}
             variant="contained"
-            color="error"
+            color="success"           
             sx={{ minWidth: 100 }}
           >
             Aceptar

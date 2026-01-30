@@ -1,86 +1,54 @@
-import axios from "axios";
+// src/services/api.ts
+import axios from 'axios';
+import { parseApiError, isRetryableError } from './apiError';
+import { useErrorStore } from '../stores/error.store';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
+  timeout: 15000, 
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("auth_token");
-      window.location.href = "/login";
+    const parsedError = parseApiError(error);
+    
+    if (parsedError.status === 401) {
+      localStorage.removeItem('auth_token');
+      delete api.defaults.headers.common.Authorization;
     }
-    return Promise.reject(error);
+    
+    const shouldShowGlobalError = [401, 500, 502, 503, 504].includes(parsedError.status);
+    
+    if (shouldShowGlobalError) {
+      const canRetry = isRetryableError(parsedError.status);
+      
+      useErrorStore.getState().setError(
+        parsedError,
+        canRetry ? () => {
+          return api.request(error.config);
+        } : undefined
+      );
+    }
+    
+    return Promise.reject(parsedError);
   }
 );
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  photoUrl?: string;
-  role?: string;     
-}
-
-export interface UserProfileUpdate {
-  name: string;
-  email: string;
-}
-
-
-export const fetchUserProfile = async (): Promise<User> => {
-  try {
-    const response = await api.get<User>("/users/profile"); 
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "No se pudo cargar el perfil");
-  }
-};
-
-export const updateUserProfile = async (data: UserProfileUpdate): Promise<User> => {
-  try {
-    const response = await api.patch<User>("/users/profile", data);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al actualizar el perfil");
-  }
-};
-
-export const uploadProfilePicture = async (file: File): Promise<string> => {
-  try {
-    const formData = new FormData();
-    formData.append("photo", file);
-
-    const response = await api.post<{ photoUrl: string }>("/users/profile-picture", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return response.data.photoUrl;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al subir la foto de perfil");
-  }
-};
-
-export const logout = () => {
-  localStorage.removeItem("auth_token");
-  window.location.href = "/login";
-};
 
 export default api;
