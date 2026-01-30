@@ -1,29 +1,65 @@
-import { Box, Typography, Button } from '@mui/material';
+// src/components/Profile/ErrorMessage.tsx
+import { Alert, Snackbar, IconButton } from '@mui/material';
+import { useErrorStore } from '../../stores/error.store';
+import { X, RefreshCw } from 'lucide-react';
 
-interface Props {
-  message: string;
-}
+const ErrorMessage = () => {
+  const { error, retryAction, clearError } = useErrorStore();
 
-const ErrorMessage = ({ message }: Props) => {
+  const handleRetry = () => {
+    if (retryAction) {
+      clearError();
+      retryAction();
+    }
+  };
+
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2,
-      }}
+    <Snackbar
+      open={!!error}
+      autoHideDuration={6000}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      onClose={clearError}
+      sx={{ mt: 2 }}
     >
-      <Typography variant="h6" color="error">
-        {message}
-      </Typography>
-
-      <Button variant="contained" onClick={() => window.location.reload()}>
-        Reintentar
-      </Button>
-    </Box>
+      <Alert
+        severity="error"
+        variant="filled"
+        onClose={clearError}
+        sx={{
+          width: '100%',
+          minWidth: 400,
+          boxShadow: 3,
+          '& .MuiAlert-message': {
+            flex: 1,
+          },
+        }}
+        action={
+          <>
+            {retryAction && (
+              <IconButton
+                size="small"
+                color="inherit"
+                onClick={handleRetry}
+                sx={{ mr: 1 }}
+                title="Reintentar"
+              >
+                <RefreshCw size={18} />
+              </IconButton>
+            )}
+            <IconButton
+              size="small"
+              color="inherit"
+              onClick={clearError}
+              title="Cerrar"
+            >
+              <X size={18} />
+            </IconButton>
+          </>
+        }
+      >
+        <strong>Error:</strong> {error?.message}
+      </Alert>
+    </Snackbar>
   );
 };
 

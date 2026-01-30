@@ -1,7 +1,6 @@
 // src/components/chats/ChatHeader.tsx
 import React from 'react';
 
-// Definir tipo aquí mismo (copiado del store)
 interface Chat {
   id: string;
   name: string;

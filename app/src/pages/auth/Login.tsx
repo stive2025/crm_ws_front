@@ -1,38 +1,34 @@
+// src/pages/auth/Login.tsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
 import callImage from "../../images/called.png";
 import { useAuthStore } from "../../stores/auth.store";
 import { Input } from "../../components/common/Input";
 import { Button } from "../../components/common/Button";
 import { Loader } from "../../components/common/Loader";
+import { CustomAlert } from "../../components/common/Alert";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     login,
     loading,
     error: errorFromStore,
     isAuthenticated,
+    user,
   } = useAuthStore();
 
-  // Efecto para redirigir cuando esté autenticado
   useEffect(() => {
-    console.log("🔍 Login - Efecto ejecutándose, isAuthenticated:", isAuthenticated);
-    
-    // Verificar tanto el store como localStorage para mayor seguridad
-    const token = localStorage.getItem("auth_token");
-    if (token || isAuthenticated) {
-      console.log("✅ Login - Redirigiendo a /profile");
-      // Pequeño delay para asegurar que todo está listo
-      setTimeout(() => {
-        navigate("/profile", { replace: true });
-      }, 100);
+    if (isAuthenticated && user) {
+      const from = (location.state as any)?.from || "/profile";
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate, location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,14 +37,7 @@ const Login = () => {
       return;
     }
 
-    console.log("🔄 Login - Iniciando proceso de login...");
-    const success = await login(email, password);
-    
-    if (success) {
-      console.log("✅ Login - Proceso completado, esperando redirección...");
-    } else {
-      console.log("❌ Login - Falló el proceso");
-    }
+    await login(email, password);
   };
 
   return (
@@ -87,7 +76,10 @@ const Login = () => {
               </Button>
 
               {errorFromStore && (
-                <p className="login-error mt-3">{errorFromStore}</p>
+                <CustomAlert 
+                  severity="error"
+                  message={errorFromStore}
+                />
               )}
             </form>
           </div>

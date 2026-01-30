@@ -1,7 +1,9 @@
+// src/pages/profile/Profile.tsx
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../stores/auth.store';
 import SidebarNavigation from '../../components/MUI/SidebarNavigation';
 import { Button } from '../../components/common/Button';
+import { CustomAlert } from '../../components/common/Alert'; 
 import {
   Box,
   Paper,
@@ -13,11 +15,9 @@ import {
   CircularProgress,
   Dialog,
   DialogContent,
-  Alert,
 } from '@mui/material';
 import { SquarePen, CircleUser, QrCode } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import ErrorMessage from '../../components/Profile/ErrorMessage';
 
 const SIDEBAR_WIDTH = 80;
 
@@ -45,22 +45,28 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (user) {
+      const data = {
+        nombre: user.name,
+        correo: user.email,
+        cargo: ROLE_LABELS[user.role] ?? '',
+      };
 
-    const data = {
-      nombre: user.name,
-      correo: user.email,
-      cargo: ROLE_LABELS[user.role] ?? '',
-    };
-
-    setUserData(data);
-    setOriginalData({
-      nombre: data.nombre,
-      correo: data.correo,
-    });
-  }, [user]);
+      setUserData(data);
+      setOriginalData({
+        nombre: data.nombre,
+        correo: data.correo,
+      });
+      setIsInitialLoad(false);
+    }
+    
+    if (!loading) {
+      setIsInitialLoad(false);
+    }
+  }, [user, loading]);
 
   const isDirty =
     userData.nombre !== originalData.nombre ||
@@ -91,7 +97,6 @@ const Profile = () => {
     try {
       setSaving(true);
 
-      // 👉 Aquí va tu API real
       await new Promise((r) => setTimeout(r, 1000));
 
       setOriginalData({
@@ -107,7 +112,7 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
+  if (isInitialLoad) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
@@ -116,8 +121,9 @@ const Profile = () => {
   }
 
   if (error) {
-    return <ErrorMessage message={error} />;
+    return null; 
   }
+
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'grey.50' }}>
@@ -157,10 +163,10 @@ const Profile = () => {
 
                 <Box>
                   <Typography variant="h6" fontWeight={700}>
-                    {userData.nombre}
+                    {userData.nombre || 'Usuario'}
                   </Typography>
                   <Typography sx={{ color: 'grey.300' }}>
-                    {userData.cargo}
+                    {userData.cargo || 'Cargo no especificado'}
                   </Typography>
                   <Chip label="Activo" color="success" size="small" sx={{ mt: 1 }} />
                 </Box>
@@ -198,8 +204,19 @@ const Profile = () => {
                 />
               </Box>
 
-              {errorMsg && <Alert severity="error" sx={{ mt: 3 }}>{errorMsg}</Alert>}
-              {successMsg && <Alert severity="success" sx={{ mt: 3 }}>{successMsg}</Alert>}
+              {errorMsg && (
+                <CustomAlert 
+                  severity="error"
+                  message={errorMsg}
+                />
+              )}
+              
+              {successMsg && (
+                <CustomAlert 
+                  severity="success"
+                  message={successMsg}
+                />
+              )}
 
               {/* BOTONES */}
               <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
@@ -226,7 +243,7 @@ const Profile = () => {
             </Paper>
           </Box>
 
-          {/* PANEL DERECHO (INTOCABLE) */}
+          {/* PANEL DERECHO */}
           <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', ml: 2 }}>
             <Paper elevation={0} sx={{ width: '100%', height: '100%', position: 'relative', bgcolor: '#ece5dd' }}>
               <Box

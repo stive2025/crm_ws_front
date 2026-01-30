@@ -48,19 +48,16 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
   );
 };
 
-// Hook para prevenir salida sin guardar cambios
 export const useConfirmUnsavedChanges = () => {
-  const isDirty = useUserStore((state) => state.isDirty);  // ← Mejor forma (selector)
+  const isDirty = useUserStore((state) => state.isDirty);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
         e.preventDefault();
-        // Mensaje estándar en la mayoría de navegadores modernos
-        e.returnValue = 'Tienes cambios sin guardar. ¿Estás seguro de querer salir?';
+        return 'Tienes cambios sin guardar. ¿Estás seguro de querer salir?';
       }
     };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
