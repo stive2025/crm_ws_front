@@ -90,8 +90,6 @@ const Profile = () => {
 
     try {
       setSaving(true);
-
-      // 👉 Aquí va tu API real
       await new Promise((r) => setTimeout(r, 1000));
 
       setOriginalData({
@@ -121,36 +119,74 @@ const Profile = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'grey.50' }}>
-      <Box sx={{ width: SIDEBAR_WIDTH, flexShrink: 0, display: { xs: 'none', md: 'block' } }}>
+
+      {/* SIDEBAR SIEMPRE VISIBLE */}
+      <Box
+        sx={{
+          width: SIDEBAR_WIDTH,
+          flexShrink: 0,
+        }}
+      >
         <SidebarNavigation activePage="profile" />
       </Box>
 
       <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+
+        {/* HEADER */}
         <Paper elevation={0} square sx={{ width: '100%', backgroundColor: '#005351' }}>
           <Box sx={{ px: 2.5, py: 2.5 }}>
             <Box component="img" src="/sefil.png" alt="Logo" sx={{ height: 32 }} />
           </Box>
         </Paper>
 
-        <Box sx={{ display: 'flex', height: 'calc(100vh - 80px)', pb: 2 }}>
-          {/* PANEL IZQUIERDO */}
-          <Box sx={{ width: 420, flexShrink: 0, pr: 2 }}>
+        {/* CONTENIDO */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            minHeight: { xs: 'calc(100vh - 80px)', md: 'calc(100vh - 80px)' },
+            pb: 2,
+          }}
+        >
+
+          {/* PANEL IZQUIERDO CON INFO DEL USUARIO */}
+          <Box
+            sx={{
+              width: { xs: '100%', md: 420 },
+              flexShrink: 0,
+              pr: { xs: 0, md: 2 },
+              display: 'flex',
+              flexDirection: 'column',
+              height: { xs: 'calc(100vh - 80px)', md: 'auto' },
+            }}
+          >
             <Paper
               elevation={2}
               sx={{
                 p: 2,
                 borderRadius: 0,
                 width: '100%',
-                minHeight: '100%',
                 backgroundColor: '#414040',
                 color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
               }}
             >
               <Typography variant="h5" fontWeight={700} mb={4}>
                 Mi perfil
               </Typography>
 
-              <Box sx={{ display: 'flex', gap: 3, mb: 4 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 3,
+                  mb: 4,
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: { xs: 'center', md: 'flex-start' },
+                  textAlign: { xs: 'center', md: 'left' },
+                }}
+              >
                 <Avatar sx={{ width: 110, height: 110, bgcolor: '#005351' }}>
                   {userData.nombre.charAt(0)}
                 </Avatar>
@@ -201,11 +237,23 @@ const Profile = () => {
               {errorMsg && <Alert severity="error" sx={{ mt: 3 }}>{errorMsg}</Alert>}
               {successMsg && <Alert severity="success" sx={{ mt: 3 }}>{successMsg}</Alert>}
 
-              {/* BOTONES */}
-              <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+              <Box
+                sx={{
+                  mt: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  alignItems: 'center',
+                }}
+              >
                 <Button
                   onClick={() => setOpenQR(true)}
-                  style={{ maxWidth: 260, backgroundColor: '#00ABAB', color: '#fff' }}
+                  style={{
+                    maxWidth: 260,
+                    width: '100%',
+                    backgroundColor: '#00ABAB',
+                    color: '#fff'
+                  }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <QrCode size={16} />
@@ -213,12 +261,25 @@ const Profile = () => {
                   </Box>
                 </Button>
 
-                <Button variant="secondary" style={{ maxWidth: 260 }}>
+                <Button
+                  variant="secondary"
+                  style={{
+                    maxWidth: 260,
+                    width: '100%'
+                  }}
+                >
                   Cambiar contraseña
                 </Button>
 
                 {isDirty && (
-                  <Button onClick={handleSave} disabled={saving} style={{ maxWidth: 260 }}>
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    style={{
+                      maxWidth: 260,
+                      width: '100%'
+                    }}
+                  >
                     {saving ? 'Guardando...' : 'Guardar cambios'}
                   </Button>
                 )}
@@ -226,8 +287,16 @@ const Profile = () => {
             </Paper>
           </Box>
 
-          {/* PANEL DERECHO (INTOCABLE) */}
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', ml: 2 }}>
+          {/* PANEL DERECHO OCULTO EN MÓVIL */}
+          <Box
+            sx={{
+              flex: 1,
+              display: { xs: 'none', md: 'flex' },
+              justifyContent: 'center',
+              ml: { xs: 0, md: 2 },
+              mt: { xs: 2, md: 0 },
+            }}
+          >
             <Paper elevation={0} sx={{ width: '100%', height: '100%', position: 'relative', bgcolor: '#ece5dd' }}>
               <Box
                 sx={{
@@ -256,9 +325,9 @@ const Profile = () => {
               </Box>
             </Paper>
           </Box>
+
         </Box>
 
-        {/* MODAL QR */}
         <Dialog open={openQR} onClose={() => setOpenQR(false)}>
           <DialogContent sx={{ textAlign: 'center', p: 4 }}>
             <Typography fontWeight={700} mb={2}>
@@ -268,6 +337,7 @@ const Profile = () => {
             <Button onClick={() => setOpenQR(false)}>Cerrar</Button>
           </DialogContent>
         </Dialog>
+
       </Box>
     </Box>
   );
