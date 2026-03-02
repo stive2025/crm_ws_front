@@ -19,15 +19,9 @@ const Login = () => {
     isAuthenticated,
   } = useAuthStore();
 
-  // Efecto para redirigir cuando esté autenticado
   useEffect(() => {
-    console.log("🔍 Login - Efecto ejecutándose, isAuthenticated:", isAuthenticated);
-    
-    // Verificar tanto el store como localStorage para mayor seguridad
     const token = localStorage.getItem("auth_token");
     if (token || isAuthenticated) {
-      console.log("✅ Login - Redirigiendo a /profile");
-      // Pequeño delay para asegurar que todo está listo
       setTimeout(() => {
         navigate("/profile", { replace: true });
       }, 100);
@@ -41,14 +35,7 @@ const Login = () => {
       return;
     }
 
-    console.log("🔄 Login - Iniciando proceso de login...");
-    const success = await login(email, password);
-    
-    if (success) {
-      console.log("✅ Login - Proceso completado, esperando redirección...");
-    } else {
-      console.log("❌ Login - Falló el proceso");
-    }
+    await login(email, password);
   };
 
   return (
@@ -62,12 +49,18 @@ const Login = () => {
               <span className="divider-icon">🔑</span>
             </div>
 
-            <h2 className="login-subtitle">Ingrese sus Credenciales</h2>
+            <h2 className="login-subtitle">
+              Ingrese sus Credenciales
+            </h2>
 
-            <form className="login-form" onSubmit={handleSubmit}>
+            <form
+              className="login-form"
+              onSubmit={handleSubmit}
+              noValidate
+            >
               <Input
+                label="Correo electrónico"
                 type="email"
-                placeholder="Correo"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -75,8 +68,8 @@ const Login = () => {
               />
 
               <Input
+                label="Contraseña"
                 type="password"
-                placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -87,7 +80,13 @@ const Login = () => {
               </Button>
 
               {errorFromStore && (
-                <p className="login-error mt-3">{errorFromStore}</p>
+                <p
+                  className="login-error mt-3"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  {errorFromStore}
+                </p>
               )}
             </form>
           </div>
@@ -96,7 +95,7 @@ const Login = () => {
             <img
               src={callImage}
               className="login-image"
-              alt="Ilustración de llamada o contacto"
+              alt="Ilustración representando contacto telefónico"
             />
           </div>
         </div>
