@@ -1,5 +1,7 @@
 // src/components/common/Input.tsx
 
+import { useId } from "react";
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
@@ -8,17 +10,47 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = ({
   label,
   error,
-  className = '',
+  id,
+  className = "",
+  required,
   ...props
 }: InputProps) => {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const errorId = `${inputId}-error`;
+
   return (
     <div className="flex flex-col gap-1">
-      {label && <label className="text-sm font-medium">{label}</label>}
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="text-sm font-medium"
+        >
+          {label}
+          {required && <span aria-hidden="true"> *</span>}
+        </label>
+      )}
+
       <input
-        className={`login-input ${className}`}  // ← usa TU clase de Login.css + cualquier extra
+        id={inputId}
+        required={required}
+        aria-required={required}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
+        className={`login-input ${className}`}
         {...props}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+
+      {error && (
+        <p
+          id={errorId}
+          role="alert"
+          aria-live="assertive"
+          className="text-red-500 text-xs mt-1"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 };
